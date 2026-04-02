@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Finance Tracker{% endblock %}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter var', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+          },
+        },
+      },
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; }
+  </style>
+  {% block extra_head %}{% endblock %}
+</head>
+<body class="min-h-full bg-slate-50 text-slate-900 antialiased">
+  <header class="border-b border-slate-200/80 bg-white shadow-sm">
+    <nav class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div class="flex h-16 items-center justify-between">
+        <div class="flex shrink-0 items-center gap-8">
+          <a href="{% if user.is_authenticated %}{% url 'expenses:transaction_list' %}{% else %}{% url 'login' %}{% endif %}"
+             class="text-lg font-semibold tracking-tight text-slate-900">
+            Finance Tracker
+          </a>
+          <div class="hidden md:flex md:items-center md:gap-1">
+            {% if user.is_authenticated %}
+              <a href="{% url 'expenses:transaction_list' %}"
+                 class="rounded-lg px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900">
+                Dashboard
+              </a>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="hidden md:flex md:items-center md:gap-2">
+          {% if user.is_authenticated %}
+            <span class="hidden text-sm text-slate-500 lg:inline">{{ user.username }}</span>
+            <form method="post" action="{% url 'logout' %}" class="inline">
+              {% csrf_token %}
+              <button type="submit"
+                      class="rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white shadow hover:bg-slate-800">
+                Log out
+              </button>
+            </form>
+          {% else %}
+            <a href="{% url 'login' %}"
+               class="rounded-lg px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100">
+              Log in
+            </a>
+            <a href="{% url 'expenses:register' %}"
+               class="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow hover:bg-emerald-500">
+              Register
+            </a>
+          {% endif %}
+        </div>
+
+        <div class="flex items-center md:hidden">
+          <button type="button"
+                  id="nav-toggle"
+                  class="inline-flex items-center justify-center rounded-lg p-2 text-slate-600 hover:bg-slate-100 hover:text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  aria-expanded="false"
+                  aria-controls="mobile-nav">
+            <span class="sr-only">Open menu</span>
+            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div id="mobile-nav" class="hidden border-t border-slate-100 pb-4 pt-2 md:hidden">
+        <div class="flex flex-col gap-1">
+          {% if user.is_authenticated %}
+            <a href="{% url 'expenses:transaction_list' %}"
+               class="rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100">
+              Dashboard
+            </a>
+            <span class="px-3 py-2 text-xs text-slate-500">{{ user.username }}</span>
+            <form method="post" action="{% url 'logout' %}">
+              {% csrf_token %}
+              <button type="submit"
+                      class="w-full rounded-lg bg-slate-900 px-3 py-2 text-left text-sm font-medium text-white hover:bg-slate-800">
+                Log out
+              </button>
+            </form>
+          {% else %}
+            <a href="{% url 'login' %}"
+               class="rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100">
+              Log in
+            </a>
+            <a href="{% url 'expenses:register' %}"
+               class="rounded-lg bg-emerald-600 px-3 py-2 text-sm font-semibold text-white hover:bg-emerald-500">
+              Register
+            </a>
+          {% endif %}
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <main class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+    {% if messages %}
+      <div class="mb-6 space-y-3" role="status" aria-live="polite">
+        {% for message in messages %}
+          <div class="flex items-start gap-3 rounded-xl border px-4 py-3 shadow-sm
+            {% if 'success' in message.tags %}
+              border-emerald-200 bg-emerald-50 text-emerald-900
+            {% elif 'error' in message.tags %}
+              border-red-200 bg-red-50 text-red-900
+            {% elif 'warning' in message.tags %}
+              border-amber-200 bg-amber-50 text-amber-900
+            {% else %}
+              border-slate-200 bg-white text-slate-800
+            {% endif %}">
+            <span class="text-sm font-medium">{{ message }}</span>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    {% block content %}{% endblock %}
+  </main>
+
+  <script>
+    (function () {
+      var btn = document.getElementById('nav-toggle');
+      var panel = document.getElementById('mobile-nav');
+      if (!btn || !panel) return;
+      btn.addEventListener('click', function () {
+        var open = panel.classList.toggle('hidden') === false;
+        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      });
+    })();
+  </script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>
