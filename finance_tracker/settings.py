@@ -8,7 +8,6 @@ https://docs.djangoproject.com/en/5.2/topics/settings/
 import os
 from pathlib import Path
 
-import dj_database_url
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -25,7 +24,7 @@ if not SECRET_KEY:
 
 DEBUG = os.environ.get("DEBUG", "False").lower() in ("true", "1", "yes")
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -73,14 +72,16 @@ WSGI_APPLICATION = "finance_tracker.wsgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
-# Set DATABASE_URL (e.g. postgres://user:pass@host:port/dbname) in the environment or .env
 
 DATABASES = {
-    "default": dj_database_url.config(
-        default=os.environ.get("DATABASE_URL"),
-        conn_max_age=600,
-        conn_health_checks=True,
-    )
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": os.environ.get("POSTGRES_DB", ""),
+        "USER": os.environ.get("POSTGRES_USER", ""),
+        "PASSWORD": os.environ.get("POSTGRES_PASSWORD", ""),
+        "HOST": os.environ.get("POSTGRES_HOST", "localhost"),
+        "PORT": os.environ.get("POSTGRES_PORT", "5432"),
+    }
 }
 
 
@@ -119,7 +120,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = "static/"
-STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
 STORAGES = {
     "default": {
@@ -139,3 +140,15 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 LOGIN_URL = "login"
 LOGIN_REDIRECT_URL = "expenses:transaction_list"
 LOGOUT_REDIRECT_URL = "login"
+
+# settings.py
+
+# Trust the Render domain for form submissions
+CSRF_TRUSTED_ORIGINS = [
+    'https://*.onrender.com',
+    'https://your-app-name.onrender.com', # Put your actual URL here
+]
+
+# Ensure cookies are secure since Render uses HTTPS
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
