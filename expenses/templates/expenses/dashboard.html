@@ -33,6 +33,26 @@
       <h2 class="text-lg font-semibold text-slate-900">Transactions</h2>
       <p class="text-sm text-slate-500">Manage entries with edit or delete.</p>
     </div>
+    <div class="border-b border-slate-100 px-6 py-3">
+      <form method="get" action="{% url 'expenses:transaction_list' %}" class="flex w-full flex-col gap-2 sm:max-w-xl sm:flex-row sm:items-center">
+        <label for="transaction-search" class="sr-only">Search by title</label>
+        <input
+          type="search"
+          name="q"
+          id="transaction-search"
+          value="{{ search_query }}"
+          placeholder="Search by title…"
+          autocomplete="off"
+          class="min-w-0 flex-1 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+        />
+        <button
+          type="submit"
+          class="inline-flex shrink-0 items-center justify-center rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white shadow hover:bg-slate-800"
+        >
+          Search
+        </button>
+      </form>
+    </div>
     <div class="overflow-x-auto">
       {% if transactions %}
         <table class="min-w-full divide-y divide-slate-200 text-left text-sm">

@@ -37,7 +37,11 @@ class TransactionListView(LoginRequiredMixin, ListView):
     template_name = "expenses/dashboard.html"
 
     def get_queryset(self):
-        return Transaction.objects.filter(user=self.request.user)
+        qs = Transaction.objects.filter(user=self.request.user)
+        q = self.request.GET.get("q", "").strip()
+        if q:
+            qs = qs.filter(title__icontains=q)
+        return qs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -45,6 +49,7 @@ class TransactionListView(LoginRequiredMixin, ListView):
             self.get_queryset().aggregate(s=Sum("amount"))["s"] or Decimal("0")
         )
         context["total_balance"] = total
+        context["search_query"] = self.request.GET.get("q", "").strip()
         return context
 
 
