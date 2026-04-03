@@ -146,7 +146,7 @@ LOGOUT_REDIRECT_URL = "login"
 # Trust the Render domain for form submissions
 CSRF_TRUSTED_ORIGINS = [
     'https://*.onrender.com',
-    'https://your-app-name.onrender.com', # Put your actual URL here
+    'https://django-finance-tracker-h8tc.onrender.com', # Put your actual URL here
 ]
 
 # Ensure cookies are secure since Render uses HTTPS
